@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -47,6 +46,7 @@ public class ch16AsyncCompletableFuture {
         findPrices("myPhone").forEach(price -> log.info("price: {}", price));
         long end = (System.nanoTime() - start) / 1_000_000;
         log.info("endTime: {}", end);
+        // 5035
     }
     private List<String> findPrices(String product) {
         return shops.stream()
@@ -59,6 +59,7 @@ public class ch16AsyncCompletableFuture {
         findPricesParallel("myPhone").forEach(price -> log.info("price: {}", price));
         long end = (System.nanoTime() - start) / 1_000_000;
         log.info("endTime: {}", end);
+        // 2017
     }
     private List<String> findPricesParallel(String product) {
         return shops.parallelStream()
@@ -71,10 +72,41 @@ public class ch16AsyncCompletableFuture {
         findPricesAsync("myPhone").forEach(price -> log.info("price: {}", price));
         long end = (System.nanoTime() - start) / 1_000_000;
         log.info("endTime:{}", end);
+        // 2045
     }
     private List<String> findPricesAsync(String product) {
         List<CompletableFuture<String>> priceFutures = shops.stream()
                 .map(shop -> CompletableFuture.supplyAsync(() -> String.format("%s price is %.3f", shop.getName(), shop.getPrice(product))))
+                .collect(Collectors.toList());
+
+        return priceFutures.stream()
+                .map(CompletableFuture::join)
+                .collect(Collectors.toList());
+    }
+
+    @Test
+    public void nonBlockAsyncExcutorCode() {
+        long start = System.nanoTime();
+        findPricesAsyncExecutor("myPhone").forEach(price -> log.info("price: {}", price));
+        long end = (System.nanoTime() - start) / 1_000_000;
+        log.info("endTime:{}", end);
+        // 2016
+    }
+
+    private final Executor executor = Executors.newFixedThreadPool(Math.min(shops.size(), 100), new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread();
+            // 자바에서 일반 스레드가 싱행 중이라면 자바 프로그램은 종료되지 않는다.
+            // 반면 데몬 스레드같은경우 자바 프로그램이 종료될때 스레드를 강제로 다운시킬 수 있다.
+            t.setDaemon(true);
+            return t;
+        }
+    });
+
+    private List<String> findPricesAsyncExecutor(String product) {
+        List<CompletableFuture<String>> priceFutures = shops.stream()
+                .map(shop -> CompletableFuture.supplyAsync(() -> String.format("%s price is %.3f", shop.getName(), shop.getPrice(product), executor)))
                 .collect(Collectors.toList());
 
         return priceFutures.stream()
