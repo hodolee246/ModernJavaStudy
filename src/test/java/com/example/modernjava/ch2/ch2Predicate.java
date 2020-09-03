@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 @Slf4j
 public class ch2Predicate {
@@ -95,4 +96,18 @@ public class ch2Predicate {
         }
         return result;
     }
+
+    @Test
+    public void threadRun() {
+        // 그냥 스레드로 헬로우 월드 찍기
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                log.info("Hello World");
+            }
+        });
+        // 람다로 스레드 헬로우 월드 찍기
+        Thread t = new Thread(() -> log.info("Hello World"));
+    }
+
 }

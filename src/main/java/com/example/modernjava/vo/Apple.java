@@ -1,10 +1,17 @@
 package com.example.modernjava.vo;
 
 
-public class Apple {
+import java.util.Comparator;
+
+public class Apple implements Comparator<Apple> {
 
     private int weight;
     private Color color;
+
+    @Override
+    public int compare(Apple o1, Apple o2) {
+        return 0;
+    }
 
     public enum Color {
         RED, GREEN

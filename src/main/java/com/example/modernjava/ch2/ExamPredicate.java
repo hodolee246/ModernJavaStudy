@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FilterApples {
+public class ExamPredicate {
 
     // 기존의 자바 코드
 
@@ -59,6 +59,7 @@ public class FilterApples {
     private List<Apple> inventory = Arrays.asList(new Apple(150, Apple.Color.GREEN),
                                                 new Apple(110, Apple.Color.GREEN),
                                                 new Apple(170, Apple.Color.RED));
+
 
     List<Apple> redApples = filterApples(inventory, new ApplePredicate() {
         @Override
