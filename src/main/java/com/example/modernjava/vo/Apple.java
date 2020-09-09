@@ -17,6 +17,10 @@ public class Apple implements Comparator<Apple> {
         RED, GREEN
     }
 
+    public Apple(int weight) {
+        this.weight = weight;
+    }
+
     public Color getColor() {
         return color;
     }
