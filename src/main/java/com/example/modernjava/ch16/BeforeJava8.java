@@ -2,7 +2,7 @@ package com.example.modernjava.ch16;
 
 import java.util.concurrent.*;
 
-public class BeforeJava5 {
+public class BeforeJava8 {
     public static void main(String[] args) {
         ExecutorService executorService = Executors.newCachedThreadPool();
         Future<Double> future = executorService.submit(new Callable<Double>() {

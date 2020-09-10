@@ -15,7 +15,8 @@ public class ch16AsyncCompletableFuture {
     private List<Shop> shops = Arrays.asList(
             new Shop("BestPrice"),
             new Shop("MyFavoriteShop"),
-            new Shop("Inwoo"),
+            new Shop("InWoo"),
+            new Shop("InWoo"),
             new Shop("InWoo"),
             new Shop("JIW")
     );
@@ -24,11 +25,12 @@ public class ch16AsyncCompletableFuture {
     public void asyncFuture() {
         Shop shop = new Shop("BestShop");
         long start = System.nanoTime();
-        Future<Double> future = shop.getPriceAsync("myProduct");
+        Future<Double> future = shop.getPriceAsync1("myProduct");
         long invocationTime = ((System.nanoTime() - start)) / 1_000_000;
         log.info("Invocation returned after invocationTime: {}", invocationTime);
+        // 다른 스레드 작업 메소드
         try {
-            double price = future.get();
+            double price = future.get(); // 가격정보가 있으면 Future에서 가격 정보를 읽고 없으면 블록한다.
             log.info("price: {}", price);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -37,29 +39,30 @@ public class ch16AsyncCompletableFuture {
         log.info("price return after: {}", retrievalTime);
         // invocationTime: 3
         // price: 146.6...
-        // after: 1027
+        // after: 1033
     }
-
+    // 순차 검색 코드
     @Test
-    public void blockCode() {
+    public void noneBlockCode1() {
         long start = System.nanoTime();
         findPrices("myPhone").forEach(price -> log.info("price: {}", price));
         long end = (System.nanoTime() - start) / 1_000_000;
         log.info("endTime: {}", end);
-        // 5035
+        // 4035
     }
     private List<String> findPrices(String product) {
         return shops.stream()
                 .map(shop -> String.format("%s price is %.3f", shop.getName(), shop.getPrice(product)))
                 .collect(Collectors.toList());
     }
+    // 병렬 검색 코드
     @Test
-    public void noneBlockCode() {
+    public void noneBlockCode2() {
         long start = System.nanoTime();
         findPricesParallel("myPhone").forEach(price -> log.info("price: {}", price));
         long end = (System.nanoTime() - start) / 1_000_000;
         log.info("endTime: {}", end);
-        // 2017
+        // 1025
     }
     private List<String> findPricesParallel(String product) {
         return shops.parallelStream()
@@ -72,7 +75,7 @@ public class ch16AsyncCompletableFuture {
         findPricesAsync("myPhone").forEach(price -> log.info("price: {}", price));
         long end = (System.nanoTime() - start) / 1_000_000;
         log.info("endTime:{}", end);
-        // 2045
+        // 2035
     }
     private List<String> findPricesAsync(String product) {
         List<CompletableFuture<String>> priceFutures = shops.stream()
@@ -85,14 +88,14 @@ public class ch16AsyncCompletableFuture {
     }
 
     @Test
-    public void nonBlockAsyncExcutorCode() {
+    public void nonBlockExecutorCode() {
         long start = System.nanoTime();
         findPricesAsyncExecutor("myPhone").forEach(price -> log.info("price: {}", price));
         long end = (System.nanoTime() - start) / 1_000_000;
         log.info("endTime:{}", end);
         // 2016
     }
-
+                                                                // 검색할 상점의 수만큼, 최대 크기
     private final Executor executor = Executors.newFixedThreadPool(Math.min(shops.size(), 100), new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {

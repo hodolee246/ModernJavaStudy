@@ -25,13 +25,21 @@ public class Shop {
         delay();
         return random.nextDouble() * product.charAt(0) + product.charAt(1);
     }
-    // 이 친구가 실행이 되려면 결국에는 1초동안 잠을 자다가 값을 구한다... 굿나잇..
+    // 이 친구가 실행이 되려면 결국에는 1초동안 잠을 자다가 값을 구한다...
     public double getPrice(String product) {
         return calculatePrice(product);
     }
 
-    // 동기 -> 비동기
-    public Future<Double> getPriceAsync(String product) {
+    public Future<Double> getPriceAsync1(String product) {
+        CompletableFuture<Double> futurePrice = new CompletableFuture<>();
+        new Thread(() -> {
+            double price = calculatePrice(product);
+            futurePrice.complete(price);
+        }).start();
+        return futurePrice;
+    }
+
+    public Future<Double> getPriceAsync2(String product) {
 //        // 계산이 끝나면 결과를 리턴이 가능한 future를 이용하여
 //        CompletableFuture<Double> completableFuture = new CompletableFuture<>();
 //        // thread 에 계산식을 대입한다. (원하는 비동기)
