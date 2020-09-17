@@ -11,13 +11,15 @@ public class TempSubscriber implements Subscriber<TempInfo> {
 
     @Override
     public void onSubscribe(Subscription subscription) {
+        // 구독을 저장한다.
         this.subscription = subscription;
+        // 첫 번째 요청을 전달한다.
         subscription.request(1L);
     }
 
     @Override
     public void onNext(TempInfo tempInfo) {
-        // 수신정보 출력 후 재 요청
+        // 수신정보 출력 후 다음 정보를 요청한다.
         log.info("TempInfo: {}", tempInfo);
         subscription.request(1L);
     }
