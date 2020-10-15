@@ -86,7 +86,6 @@ public class ch19functionalProgramming {
         log.info("newSite.getOnward().getOnward() : {}", newSite.getOnward().getOnward());
     }
 
-    @Setter
     static class Tree {
         private String key;
         private int val;
@@ -94,8 +93,24 @@ public class ch19functionalProgramming {
         public Tree(String k, int v, Tree l, Tree r) {
             key = k; val = v; left = l; right = r;
         }
-    }
 
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public void setVal(int val) {
+            this.val = val;
+        }
+
+        public void setLeft(Tree left) {
+            this.left = left;
+        }
+
+        public void setRight(Tree right) {
+            this.right = right;
+        }
+    }
+    
     static class TreeProcessor {
         public static int lookup(String k, int defaultval, Tree t) {
             if(t == null)
@@ -105,12 +120,29 @@ public class ch19functionalProgramming {
             return lookup(k, defaultval, k.compareTo(t.key) < 0 ? t.left : t.right);
         }
     }
-
-    /*static void update(String k, int newval, Tree t) {
-        if (k.equals(t.key))
-            t.val = newval;
-        else update(k, newval, k.compareTo(t.key) < 0 ? t.left : t.right);
-    }*/
+    // 현재 있는 Tree에 값을 반영 후 반환해주는 Update
+    public static Tree update(String k, int newVal, Tree t) {
+        if( t == null) {
+            t = new Tree(k, newVal, null, null);
+        } else if(k.equals(t.key)) {
+            t.val = newVal;
+        } else if(k.compareTo(t.key) < 0 ) {
+            t.left = update(k, newVal, t.left);
+        } else {
+            t.right = update(k, newVal, t.right);
+        }
+        return t;
+    }
+    // 새로운 Tree를 생성하여 값을 반영 후 반환해주는 fUpdate
+    public static Tree fUpdate(String k, int newVal, Tree t) {
+        return (t == null) ?
+                new Tree(k, newVal, null, null) :
+                k.equals(t.key) ?
+                        new Tree(k, newVal, t.left, t.right) :
+                        k.compareTo(t.key) < 0 ?
+                                new Tree(k, newVal, fUpdate(k, newVal, t.left), t.right) :
+                                new Tree(k, newVal, t.left, fUpdate(k, newVal, t.right));
+    }
 
     // 캐싱
     // 인자값이 동일하다면 반환값이 같은 참조투명성은 유지되지만 실질적으로 함수형프로그래밍은 아니다.
