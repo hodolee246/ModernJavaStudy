@@ -49,6 +49,13 @@
             <version>2.2.19</version>
         </dependency>
 
+        <!-- ch20 scala -->
+        <!-- https://mvnrepository.com/artifact/org.scala-lang/scala-library -->
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.13.3</version>
+        </dependency>
 
     </dependencies>
 
